@@ -1,0 +1,217 @@
+'use strict';
+
+const DEFAULT_FIELDS = [
+  { id: 'f1', label: 'Portfolio URL', value: '' },
+  { id: 'f2', label: 'LinkedIn URL', value: '' },
+  { id: 'f3', label: 'Address', value: '' },
+  { id: 'f4', label: 'Email', value: '' },
+  { id: 'f5', label: 'Phone', value: '' },
+];
+
+let fields = [];
+let editFields = [];
+let isEditing = false;
+let toastTimer = null;
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// Storage
+function loadFields() {
+  chrome.storage.sync.get(['fields'], (result) => {
+    fields = (result.fields && result.fields.length) ? result.fields : DEFAULT_FIELDS;
+    renderViewMode();
+  });
+}
+
+function saveFields(data) {
+  chrome.storage.sync.set({ fields: data });
+}
+
+// Toast
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.remove('hidden');
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.classList.add('hidden'), 220);
+  }, 1400);
+}
+
+// View mode
+function renderViewMode() {
+  const list = document.getElementById('fields-list');
+  const empty = document.getElementById('empty-state');
+  list.innerHTML = '';
+
+  if (!fields.length) {
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  fields.forEach((field) => {
+    const item = document.createElement('div');
+    const hasValue = field.value && field.value.trim();
+    item.className = 'field-item' + (hasValue ? '' : ' empty-value');
+
+    item.innerHTML =
+      `<span class="field-label">${escapeHtml(field.label || 'Untitled')}</span>` +
+      `<span class="field-value">${hasValue ? escapeHtml(field.value) : '<em>No value set</em>'}</span>` +
+      `<span class="copy-badge">${'Copy'}</span>`;
+
+    if (hasValue) {
+      item.addEventListener('click', () => {
+        navigator.clipboard.writeText(field.value).then(() => {
+          item.classList.add('copied');
+          item.querySelector('.copy-badge').textContent = 'Copied!';
+          showToast(`Copied: ${field.label}`);
+          setTimeout(() => {
+            item.classList.remove('copied');
+            item.querySelector('.copy-badge').textContent = 'Copy';
+          }, 1500);
+        }).catch(() => {
+          // Fallback for edge cases
+          const ta = document.createElement('textarea');
+          ta.value = field.value;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showToast(`Copied: ${field.label}`);
+        });
+      });
+    }
+
+    list.appendChild(item);
+  });
+}
+
+// Edit mode
+function enterEditMode() {
+  editFields = fields.map((f) => ({ ...f }));
+  renderEditMode();
+
+  document.getElementById('view-mode').classList.add('hidden');
+  document.getElementById('edit-mode').classList.remove('hidden');
+
+  const btn = document.getElementById('edit-toggle');
+  btn.classList.add('active');
+  document.getElementById('edit-icon').classList.add('hidden');
+  document.getElementById('cancel-icon').classList.remove('hidden');
+  document.getElementById('edit-label').textContent = 'Cancel';
+
+  isEditing = true;
+}
+
+function exitEditMode() {
+  document.getElementById('view-mode').classList.remove('hidden');
+  document.getElementById('edit-mode').classList.add('hidden');
+
+  const btn = document.getElementById('edit-toggle');
+  btn.classList.remove('active');
+  document.getElementById('edit-icon').classList.remove('hidden');
+  document.getElementById('cancel-icon').classList.add('hidden');
+  document.getElementById('edit-label').textContent = 'Edit';
+
+  isEditing = false;
+}
+
+function renderEditMode() {
+  const list = document.getElementById('edit-fields-list');
+  list.innerHTML = '';
+
+  editFields.forEach((field) => {
+    const row = document.createElement('div');
+    row.className = 'edit-row';
+    row.dataset.id = field.id;
+
+    const inputs = document.createElement('div');
+    inputs.className = 'edit-inputs';
+
+    const labelInput = document.createElement('input');
+    labelInput.className = 'input-label';
+    labelInput.type = 'text';
+    labelInput.placeholder = 'Field name';
+    labelInput.value = field.label;
+    labelInput.setAttribute('autocomplete', 'off');
+    labelInput.setAttribute('spellcheck', 'false');
+
+    const valueInput = document.createElement('input');
+    valueInput.className = 'input-value';
+    valueInput.type = 'text';
+    valueInput.placeholder = 'Value';
+    valueInput.value = field.value;
+    valueInput.setAttribute('autocomplete', 'off');
+    valueInput.setAttribute('spellcheck', 'false');
+
+    inputs.appendChild(labelInput);
+    inputs.appendChild(valueInput);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-delete';
+    delBtn.title = 'Remove field';
+    delBtn.textContent = '×';
+    delBtn.addEventListener('click', () => {
+      editFields = editFields.filter((f) => f.id !== field.id);
+      renderEditMode();
+    });
+
+    row.appendChild(inputs);
+    row.appendChild(delBtn);
+    list.appendChild(row);
+  });
+}
+
+function collectEditFields() {
+  return Array.from(document.querySelectorAll('.edit-row')).map((row) => ({
+    id: row.dataset.id,
+    label: row.querySelector('.input-label').value,
+    value: row.querySelector('.input-value').value,
+  })).filter((f) => f.label.trim() || f.value.trim());
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  loadFields();
+
+  document.getElementById('edit-toggle').addEventListener('click', () => {
+    if (isEditing) {
+      exitEditMode();
+      renderViewMode();
+    } else {
+      enterEditMode();
+    }
+  });
+
+  document.getElementById('add-field').addEventListener('click', () => {
+    editFields.push({ id: uid(), label: '', value: '' });
+    renderEditMode();
+    const rows = document.querySelectorAll('.edit-row');
+    const last = rows[rows.length - 1];
+    if (last) last.querySelector('.input-label').focus();
+  });
+
+  document.getElementById('save-btn').addEventListener('click', () => {
+    fields = collectEditFields();
+    saveFields(fields);
+    renderViewMode();
+    exitEditMode();
+    showToast('Fields saved');
+  });
+
+  document.getElementById('cancel-btn').addEventListener('click', () => {
+    exitEditMode();
+    renderViewMode();
+  });
+});

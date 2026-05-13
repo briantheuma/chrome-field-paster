@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Field Paster",
+  "version": "1.0",
+  "description": "Store and copy commonly used field values with one click",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Field Paster"
+  },
+  "permissions": ["storage"]
+}
