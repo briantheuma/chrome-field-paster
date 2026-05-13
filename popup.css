@@ -501,6 +501,14 @@ header {
   flex-shrink: 0;
 }
 
+/* Items visually inside a group in edit mode */
+.edit-row--in-group {
+  margin-left: 12px;
+  border-left: 2px solid var(--accent);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 /* Group edit row */
 .edit-row--group {
   background: var(--accent-light);

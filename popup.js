@@ -226,11 +226,14 @@ function exitEditMode() {
 function renderEditMode() {
   const list = document.getElementById('edit-fields-list');
   list.innerHTML = '';
+  let insideGroup = false;
   editFields.forEach(item => {
     const type = item.type || 'field';
+    if (type === 'group') insideGroup = true;
     const row = type === 'group'   ? buildGroupEditRow(item)
               : type === 'divider' ? buildDividerEditRow(item)
               :                      buildFieldEditRow(item);
+    if (insideGroup && type !== 'group') row.classList.add('edit-row--in-group');
     addDragListeners(row);
     list.appendChild(row);
   });
@@ -276,6 +279,7 @@ function buildFieldEditRow(item) {
   labelInput.value = item.label || '';
   labelInput.setAttribute('autocomplete', 'off');
   labelInput.setAttribute('spellcheck', 'false');
+  labelInput.addEventListener('input', () => { item.label = labelInput.value; });
 
   const valueInput = document.createElement('input');
   valueInput.className = 'input-value';
@@ -284,6 +288,7 @@ function buildFieldEditRow(item) {
   valueInput.value = item.value || '';
   valueInput.setAttribute('autocomplete', 'off');
   valueInput.setAttribute('spellcheck', 'false');
+  valueInput.addEventListener('input', () => { item.value = valueInput.value; });
 
   inputs.appendChild(labelInput);
   inputs.appendChild(valueInput);
@@ -320,6 +325,7 @@ function buildGroupEditRow(item) {
   labelInput.value = item.label || '';
   labelInput.setAttribute('autocomplete', 'off');
   labelInput.setAttribute('spellcheck', 'false');
+  labelInput.addEventListener('input', () => { item.label = labelInput.value; });
 
   const lockBtn = document.createElement('button');
   lockBtn.className = 'btn-lock-toggle' + (item.protected ? ' active' : '');
