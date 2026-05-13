@@ -19,6 +19,28 @@
   --success-light: #ecfdf5;
   --danger: #dc2626;
   --danger-light: #fef2f2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131419;
+    --surface: #1e2028;
+    --surface-hover: #272a35;
+    --border: #2e3140;
+    --text-primary: #f0f1f5;
+    --text-secondary: #8b8fa8;
+    --text-placeholder: #555870;
+    --accent: #6366f1;
+    --accent-light: #1e1f3a;
+    --accent-hover: #818cf8;
+    --success: #34d399;
+    --success-light: #0d2a1f;
+    --danger: #f87171;
+    --danger-light: #2a1212;
+  }
+}
+
+:root {
   --radius: 8px;
   --radius-sm: 5px;
 }
@@ -399,8 +421,8 @@ header {
   bottom: 14px;
   left: 50%;
   transform: translateX(-50%) translateY(8px);
-  background: #111827;
-  color: #fff;
+  background: var(--text-primary);
+  color: var(--bg);
   font-size: 12px;
   font-weight: 500;
   padding: 6px 14px;
