@@ -48,7 +48,7 @@
 body {
   width: 340px;
   min-height: 80px;
-  max-height: 560px;
+  max-height: 600px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 13px;
   background: var(--bg);
@@ -663,8 +663,7 @@ header {
 /* Add actions */
 .add-actions {
   display: flex;
-  gap: 5px;
-  margin: 6px 8px 0;
+  gap: 4px;
 }
 
 .btn-add {
@@ -673,21 +672,21 @@ header {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 7px 4px;
+  padding: 5px 4px;
   background: transparent;
   border: 1.5px dashed var(--border);
   border-radius: var(--radius);
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .btn-add svg {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   flex-shrink: 0;
 }
 
@@ -700,8 +699,7 @@ header {
 /* Transfer actions (export / import) */
 .transfer-actions {
   display: flex;
-  gap: 6px;
-  padding: 6px 8px 0;
+  gap: 5px;
 }
 
 .btn-transfer {
@@ -709,14 +707,14 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 6px 10px;
+  gap: 4px;
+  padding: 5px 8px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
@@ -725,8 +723,8 @@ header {
 }
 
 .btn-transfer svg {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   flex-shrink: 0;
 }
 
@@ -736,16 +734,29 @@ header {
   border-color: #d1d5db;
 }
 
-/* Edit actions */
+/* Edit actions — sticky footer */
 .edit-actions {
   display: flex;
-  gap: 6px;
-  padding: 10px 8px 10px;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 8px 10px;
   border-top: 1px solid var(--border);
-  margin-top: 8px;
   background: var(--bg);
   position: sticky;
   bottom: 0;
+}
+
+.edit-actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.edit-actions-save-cancel {
+  display: flex;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
 }
 
 .btn-primary,
