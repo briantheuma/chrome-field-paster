@@ -5,7 +5,7 @@
   "description": "Store and copy commonly used field values with one click",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Field Paster"
+    "default_title": "Field Paster",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png"
