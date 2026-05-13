@@ -13,6 +13,7 @@ let editFields = [];
 let isEditing = false;
 let toastTimer = null;
 let dragSrcId = null;
+let dragFromHandle = false;
 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -147,6 +148,7 @@ function renderEditMode() {
       `<circle cx="3" cy="8" r="1.5"/><circle cx="7" cy="8" r="1.5"/>` +
       `<circle cx="3" cy="12.5" r="1.5"/><circle cx="7" cy="12.5" r="1.5"/>` +
       `</svg>`;
+    handle.addEventListener('mousedown', () => { dragFromHandle = true; });
 
     const inputs = document.createElement('div');
     inputs.className = 'edit-inputs';
@@ -196,11 +198,11 @@ function clearDropIndicators() {
 
 function addDragListeners(row) {
   row.addEventListener('dragstart', (e) => {
-    // Only allow drag initiated from the handle
-    if (!e.target.closest('.drag-handle')) {
+    if (!dragFromHandle) {
       e.preventDefault();
       return;
     }
+    dragFromHandle = false;
     dragSrcId = row.dataset.id;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', dragSrcId);
@@ -208,6 +210,7 @@ function addDragListeners(row) {
   });
 
   row.addEventListener('dragend', () => {
+    dragFromHandle = false;
     row.classList.remove('dragging');
     clearDropIndicators();
   });
@@ -242,6 +245,47 @@ function addDragListeners(row) {
 
     renderEditMode();
   });
+}
+
+// Export / Import
+function exportFields() {
+  const data = isEditing ? collectEditFields() : fields;
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'field-paster.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${data.length} fields`);
+}
+
+function importFields(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!Array.isArray(parsed)) throw new Error();
+      const normalized = parsed.map((item) => ({
+        id: item.id || uid(),
+        label: String(item.label || ''),
+        value: String(item.value || ''),
+      }));
+      if (isEditing) {
+        editFields = normalized;
+        renderEditMode();
+      } else {
+        fields = normalized;
+        saveFields(fields);
+        renderViewMode();
+      }
+      showToast(`Imported ${normalized.length} fields`);
+    } catch (_) {
+      showToast('Invalid JSON file');
+    }
+  };
+  reader.readAsText(file);
 }
 
 function collectEditFields() {
@@ -284,5 +328,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cancel-btn').addEventListener('click', () => {
     exitEditMode();
     renderViewMode();
+  });
+
+  document.getElementById('export-btn').addEventListener('click', exportFields);
+
+  document.getElementById('import-input').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) importFields(file);
+    e.target.value = '';
   });
 });
