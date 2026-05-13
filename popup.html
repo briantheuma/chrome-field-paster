@@ -37,12 +37,27 @@
     <!-- Edit Mode -->
     <div id="edit-mode" class="hidden">
       <div id="edit-fields-list"></div>
-      <button id="add-field">
-        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        Add Field
-      </button>
+      <div class="add-actions">
+        <button id="add-field" class="btn-add">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Field
+        </button>
+        <button id="add-group" class="btn-add">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 5h12v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5zm0 0l1.5-2h4L9 5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg>
+          Group
+        </button>
+        <button id="add-divider" class="btn-add">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+          </svg>
+          Divider
+        </button>
+      </div>
       <div class="transfer-actions">
         <button id="export-btn" class="btn-transfer">
           <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
