@@ -263,19 +263,72 @@ header {
 
 .edit-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 6px;
-  padding: 7px 8px 7px 10px;
+  padding: 7px 8px 7px 6px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  transition: border-color 0.12s;
+  transition: border-color 0.12s, opacity 0.15s;
+  position: relative;
 }
 
 .edit-row:focus-within {
   border-color: #a5b4fc;
   background: var(--accent-light);
+}
+
+.edit-row.dragging {
+  opacity: 0.35;
+}
+
+.edit-row.drag-over-top::before,
+.edit-row.drag-over-bottom::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.edit-row.drag-over-top::before {
+  top: -5px;
+}
+
+.edit-row.drag-over-bottom::after {
+  bottom: -5px;
+}
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 100%;
+  min-height: 36px;
+  color: var(--text-placeholder);
+  cursor: grab;
+  flex-shrink: 0;
+  border-radius: 4px;
+  transition: color 0.12s;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle svg {
+  width: 10px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.edit-row:hover .drag-handle {
+  color: var(--text-secondary);
 }
 
 .edit-inputs {

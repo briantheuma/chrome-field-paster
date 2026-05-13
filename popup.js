@@ -12,6 +12,7 @@ let fields = [];
 let editFields = [];
 let isEditing = false;
 let toastTimer = null;
+let dragSrcId = null;
 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -135,6 +136,17 @@ function renderEditMode() {
     const row = document.createElement('div');
     row.className = 'edit-row';
     row.dataset.id = field.id;
+    row.setAttribute('draggable', 'true');
+
+    const handle = document.createElement('div');
+    handle.className = 'drag-handle';
+    handle.title = 'Drag to reorder';
+    handle.innerHTML =
+      `<svg viewBox="0 0 10 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">` +
+      `<circle cx="3" cy="3.5" r="1.5"/><circle cx="7" cy="3.5" r="1.5"/>` +
+      `<circle cx="3" cy="8" r="1.5"/><circle cx="7" cy="8" r="1.5"/>` +
+      `<circle cx="3" cy="12.5" r="1.5"/><circle cx="7" cy="12.5" r="1.5"/>` +
+      `</svg>`;
 
     const inputs = document.createElement('div');
     inputs.className = 'edit-inputs';
@@ -167,9 +179,68 @@ function renderEditMode() {
       renderEditMode();
     });
 
+    row.appendChild(handle);
     row.appendChild(inputs);
     row.appendChild(delBtn);
+
+    addDragListeners(row);
     list.appendChild(row);
+  });
+}
+
+function clearDropIndicators() {
+  document.querySelectorAll('.edit-row').forEach((r) => {
+    r.classList.remove('drag-over-top', 'drag-over-bottom');
+  });
+}
+
+function addDragListeners(row) {
+  row.addEventListener('dragstart', (e) => {
+    // Only allow drag initiated from the handle
+    if (!e.target.closest('.drag-handle')) {
+      e.preventDefault();
+      return;
+    }
+    dragSrcId = row.dataset.id;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', dragSrcId);
+    setTimeout(() => row.classList.add('dragging'), 0);
+  });
+
+  row.addEventListener('dragend', () => {
+    row.classList.remove('dragging');
+    clearDropIndicators();
+  });
+
+  row.addEventListener('dragover', (e) => {
+    if (!dragSrcId || row.dataset.id === dragSrcId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    clearDropIndicators();
+    const midY = row.getBoundingClientRect().top + row.offsetHeight / 2;
+    row.classList.add(e.clientY < midY ? 'drag-over-top' : 'drag-over-bottom');
+  });
+
+  row.addEventListener('dragleave', (e) => {
+    if (!row.contains(e.relatedTarget)) {
+      row.classList.remove('drag-over-top', 'drag-over-bottom');
+    }
+  });
+
+  row.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (!dragSrcId || row.dataset.id === dragSrcId) return;
+
+    const srcIdx = editFields.findIndex((f) => f.id === dragSrcId);
+    const dstIdx = editFields.findIndex((f) => f.id === row.dataset.id);
+    const midY = row.getBoundingClientRect().top + row.offsetHeight / 2;
+    const insertBefore = e.clientY < midY;
+
+    const [moved] = editFields.splice(srcIdx, 1);
+    const newDst = editFields.findIndex((f) => f.id === row.dataset.id);
+    editFields.splice(insertBefore ? newDst : newDst + 1, 0, moved);
+
+    renderEditMode();
   });
 }
 
