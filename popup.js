@@ -75,11 +75,10 @@ function renderViewMode() {
       hideContent = isGroupHidden(item);
       list.appendChild(buildGroupHeader(item));
     } else if (type === 'divider') {
-      if (!hideContent) {
-        const hr = document.createElement('div');
-        hr.className = 'view-divider';
-        list.appendChild(hr);
-      }
+      const hr = document.createElement('div');
+      hr.className = 'view-divider';
+      list.appendChild(hr);
+      hideContent = false;
     } else {
       if (!hideContent) list.appendChild(buildFieldItem(item));
     }
@@ -230,6 +229,7 @@ function renderEditMode() {
   editFields.forEach(item => {
     const type = item.type || 'field';
     if (type === 'group') insideGroup = true;
+    if (type === 'divider') insideGroup = false;
     const row = type === 'group'   ? buildGroupEditRow(item)
               : type === 'divider' ? buildDividerEditRow(item)
               :                      buildFieldEditRow(item);
