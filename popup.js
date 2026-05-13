@@ -1,12 +1,6 @@
 'use strict';
 
-const DEFAULT_FIELDS = [
-  { id: 'f1', label: 'Portfolio URL', value: '' },
-  { id: 'f2', label: 'LinkedIn URL', value: '' },
-  { id: 'f3', label: 'Address', value: '' },
-  { id: 'f4', label: 'Email', value: '' },
-  { id: 'f5', label: 'Phone', value: '' },
-];
+const DEFAULT_FIELDS = [];
 
 let fields = [];
 let editFields = [];

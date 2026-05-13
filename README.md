@@ -84,11 +84,11 @@ The exported file is a plain JSON array. You can edit it manually if needed:
 
 ```json
 [
-  { "id": "f1", "label": "Portfolio URL", "value": "https://yoursite.com" },
-  { "id": "f2", "label": "LinkedIn URL", "value": "https://linkedin.com/in/yourname" },
+  { "id": "f1", "label": "First Name", "value": "John" },
+  { "id": "f2", "label": "Last Name", "value": "Smith" },
   { "id": "f3", "label": "Address", "value": "123 Main St, City, Country" },
-  { "id": "f4", "label": "Email", "value": "you@example.com" },
-  { "id": "f5", "label": "Phone", "value": "+1 555 000 0000" }
+  { "id": "f4", "label": "Email Address", "value": "john@example.com" },
+  { "id": "f5", "label": "Phone Number", "value": "+1 555 000 0000" }
 ]
 ```
 
